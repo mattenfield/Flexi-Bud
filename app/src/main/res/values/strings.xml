@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Flexi Bud</string>
     <string name="app_motto">A friendly budgeting application.</string>
+    <string name="login_sub">Login</string>
+    <string name="register_sub">Register</string>
+    <string name="menu_sub">Main Menu</string>
 </resources>

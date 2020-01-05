@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "216614576370",
+    "firebase_url": "https://flexi-bud.firebaseio.com",
+    "project_id": "flexi-bud",
+    "storage_bucket": "flexi-bud.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:216614576370:android:789c51bd44adb24e70b06b",
+        "android_client_info": {
+          "package_name": "ac.uk.bucks.flexibud"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "216614576370-srlmp3ro3okels5lqdm7gnbjgoa4bi4s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ac.uk.bucks.flexibud",
+            "certificate_hash": "3c8f3320dfc9b4f9a67d0333629a5316990a2a5d"
+          }
+        },
+        {
+          "client_id": "216614576370-36d0f937r9h69p3jm6moe9hu6bu28hrk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvgoqAZKABwtdCMtY-hnCGloUchfrNco0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "216614576370-36d0f937r9h69p3jm6moe9hu6bu28hrk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -7,4 +7,17 @@
     <string name="passwordtag">Password</string>
     <string name="signintag">Sign In</string>
     <string name="signuptag">Sign Up</string>
+    <string name="menu_tag">Main Menu</string>
+    <string name="welcome_heading">Welcome to your dashboard.</string>
+    <string name="allowance_message">Remaining allowance:</string>
+    <string name="unset">NOT SET</string>
+    <string name="budget_message">Set Budget:</string>
+    <string name="overview_unset">You have not yet set a budget, please use My Weekly Cost Calculator - then set a budget.</string>
+    <string name="today_exp_message">Today\'s Expenditure:</string>
+    <string name="btnsubmit">Submit</string>
+    <string name="weeklycostsbtnval">My Weekly Costs Calculator</string>
+    <string name="setbudgetbtnval">Set My Budget</string>
+    <string name="logoutval">Log Out and Exit</string>
+    <string name="set_budget_tag">Set Budget</string>
+    <string name="back">Back</string>
 </resources>

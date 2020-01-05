@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -16,14 +17,23 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
-
+//view widgets
     ProgressBar progressBar;
     EditText email;
     EditText password;
     Button signin;
     Button signup;
-
     FirebaseAuth firebaseAuth;
+    TextView allowancevalue;
+    TextView budgetvalue;
+    TextView overview;
+    EditText todaysbudget;
+    Button weeklycostcalculator;
+    Button setbudget;
+    Button logout;
+    Button back1;
+    Button back2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
                         if(task.isSuccessful()){
                             setContentView(R.layout.main_menu);
                             Toast.makeText(MainActivity.this, "Login Successful", Toast.LENGTH_LONG).show();
+                            MenuListen();
 
                         }
                         else{
@@ -92,4 +103,59 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+    public void MenuListen(){
+
+        todaysbudget = findViewById(R.id.etTodayExpenditure);
+        weeklycostcalculator = findViewById(R.id.btnWeeklyCosts);
+        setbudget = findViewById(R.id.btnSetBudget);
+        logout = findViewById(R.id.btnLogOut);
+
+        weeklycostcalculator.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setContentView(R.layout.weekly_cost_calculator);
+                CostCalculatorListen();
+            }
+        });
+        setbudget.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setContentView(R.layout.set_budget);
+                BudgetListen();
+
+            }
+        });
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firebaseAuth.getInstance().signOut();
+                finish();
+            }
+        });
+    }
+    public void BudgetListen(){
+        back1 = findViewById(R.id.btnBack);
+
+        back1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setContentView(R.layout.main_menu);
+                    MenuListen();
+                }
+        });
+
+    }
+    public void CostCalculatorListen(){
+        back2 = findViewById(R.id.btnBack2);
+
+        back2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setContentView(R.layout.main_menu);
+                MenuListen();
+            }
+        });
+    }
 }
+
+

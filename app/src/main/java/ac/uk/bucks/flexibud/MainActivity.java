@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
 //view widgets
     ProgressBar progressBar;
     EditText email;
-    EditText password;
+    EditText password,confpassword;
     Button signin;
     Button signup;
     FirebaseAuth firebaseAuth;
@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     Button logout;
     Button back1;
     Button back2;
+    Button btnConfirm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,31 +45,58 @@ public class MainActivity extends AppCompatActivity {
         password = findViewById(R.id.etPassword);
         signin = findViewById(R.id.btnSignIn);
         signup = findViewById(R.id.btnSignUp);
+        confpassword=findViewById(R.id.etConfPassword);
+        btnConfirm=findViewById(R.id.btnConfirm);
+
 
         firebaseAuth = FirebaseAuth.getInstance();
 
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressBar.setVisibility(View.VISIBLE);
-                firebaseAuth.createUserWithEmailAndPassword(email.getText().toString(),
-                        password.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                confpassword.setVisibility(View.VISIBLE);
+                btnConfirm.setVisibility(View.VISIBLE);
+                signup.setVisibility(View.INVISIBLE);
 
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                progressBar.setVisibility(View.GONE);
+            }
+        });
 
-                                if(task.isSuccessful()){
-                                    Toast.makeText(MainActivity.this, "Registered Successfully", Toast.LENGTH_LONG).show();
-                                }
-                                else{
-                                    Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                                }
+        btnConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String pword = password.getText().toString();
+                String cpword = confpassword.getText().toString();
 
+                if(pword.equals(cpword)){
+                    progressBar.setVisibility(View.VISIBLE);
+                    firebaseAuth.createUserWithEmailAndPassword(email.getText().toString(),
+                            password.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            progressBar.setVisibility(View.GONE);
+
+                            if(task.isSuccessful()){
+                                Toast.makeText(MainActivity.this, "Registered Successfully", Toast.LENGTH_LONG).show();
+                                password.setText("");
+                                confpassword.setText("");
+                                confpassword.setVisibility(View.INVISIBLE);
+                                btnConfirm.setVisibility(View.INVISIBLE);
+                                signin.setVisibility(View.VISIBLE);
+                                signup.setVisibility(View.VISIBLE);
+                            }
+                            else{
+                                Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
                             }
 
-                        });
+
+                        }
+
+                    });
+                }
+                else {
+                    Toast.makeText(MainActivity.this, "Passwords do not match.", Toast.LENGTH_LONG).show();
+                }
 
             }
         });

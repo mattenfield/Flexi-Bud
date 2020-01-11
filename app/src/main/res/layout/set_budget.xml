@@ -56,7 +56,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="monospace"
-        android:text="Set my budget to:"
+        android:text="Set my budget to: £"
         android:textColor="@color/fontColor"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"

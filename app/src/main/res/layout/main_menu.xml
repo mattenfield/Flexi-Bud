@@ -150,15 +150,16 @@
 
     <EditText
         android:id="@+id/etTodayExpenditure"
-        android:layout_width="92dp"
-        android:layout_height="49dp"
+        android:layout_width="64dp"
+        android:layout_height="47dp"
         android:ems="10"
         android:inputType="numberDecimal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.742"
+        app:layout_constraintHorizontal_bias="0.749"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.514" />
 
     <Button
         android:id="@+id/btnExpSubmit"

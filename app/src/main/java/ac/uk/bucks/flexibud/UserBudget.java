@@ -8,6 +8,7 @@ public class UserBudget {
     private Double setBudget;
     private Double remainingBudget;
     private Date dateofLastSubmission;
+    private Date dateofBudgetSet;
 
     public UserBudget() {
     }
@@ -50,5 +51,13 @@ public class UserBudget {
 
     public void setDateofLastSubmission(Date dateofLastSubmission) {
         this.dateofLastSubmission = dateofLastSubmission;
+    }
+
+    public Date getDateofBudgetSet() {
+        return dateofBudgetSet;
+    }
+
+    public void setDateofBudgetSet(Date dateofBudgetSet) {
+        this.dateofBudgetSet = dateofBudgetSet;
     }
 }

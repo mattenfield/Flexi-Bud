@@ -19,6 +19,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Calendar;
+import java.util.Date;
+
 public class MainActivity extends AppCompatActivity {
 //view widgets
     ProgressBar progressBar;
@@ -115,14 +118,14 @@ public class MainActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.VISIBLE);
                 emailAddress=email.getText().toString();
                 userbudget.setUserName(emailAddress);
-                FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
-                userId=user.getUid();
                 firebaseAuth.signInWithEmailAndPassword(email.getText().toString(),
                         password.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>(){
 
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         progressBar.setVisibility(View.GONE);
+                        FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
+                        userId=user.getUid();
 
                         if(task.isSuccessful()){
                             setContentView(R.layout.main_menu);
@@ -192,8 +195,10 @@ public class MainActivity extends AppCompatActivity {
                     double doubleBudget = Double.valueOf(myBudget);
                     userbudget.setSetBudget(doubleBudget);
                     userbudget.setRemainingBudget(doubleBudget);
+                    Date currentTime = Calendar.getInstance().getTime();
+                    userbudget.setDateofBudgetSet(currentTime);
                     dbref.child(userId).setValue(userbudget);
-                    Toast.makeText(MainActivity.this, "Your budget was successfully set to £" + emailAddress + ".", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "Your budget was successfully set to £" + userbudget + ".", Toast.LENGTH_LONG).show();
                 }
             }
         });

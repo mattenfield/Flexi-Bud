@@ -13,7 +13,7 @@
     <string name="unset">NOT SET</string>
     <string name="budget_message">Set Budget:</string>
     <string name="overview_unset">You have not yet set a budget, please use My Weekly Cost Calculator - then set a budget.</string>
-    <string name="today_exp_message">Today\'s Expenditure:</string>
+    <string name="today_exp_message">Today\'s Expenditure: £</string>
     <string name="btnsubmit">Submit</string>
     <string name="weeklycostsbtnval">My Weekly Costs Calculator</string>
     <string name="setbudgetbtnval">Set My Budget</string>

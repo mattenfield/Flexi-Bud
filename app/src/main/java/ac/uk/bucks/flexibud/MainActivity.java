@@ -15,6 +15,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity {
 //view widgets
@@ -24,17 +27,21 @@ public class MainActivity extends AppCompatActivity {
     Button signin;
     Button signup;
     FirebaseAuth firebaseAuth;
-    TextView allowancevalue;
+    TextView costvalue;
     TextView budgetvalue;
     TextView overview;
-    EditText todaysbudget;
+    EditText todaysbudget,rent,food,amenities,disposable,mysetbudget;
     Button weeklycostcalculator;
-    Button setbudget;
+    Button setbudget,savebudget;
     Button logout;
     Button back1;
-    Button back2;
+    Button back2, calculatebtn;
     Button btnConfirm;
-
+    String emailAddress;
+    DatabaseReference dbref;
+    UserBudget userbudget;
+    Double totalweeklycost=0.0;
+    String userId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
         signup = findViewById(R.id.btnSignUp);
         confpassword=findViewById(R.id.etConfPassword);
         btnConfirm=findViewById(R.id.btnConfirm);
-
+        userbudget = new UserBudget();
+        dbref = FirebaseDatabase.getInstance().getReference().child("UserBudget");
 
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -105,6 +113,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
+                emailAddress=email.getText().toString();
+                userbudget.setUserName(emailAddress);
+                FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
+                userId=user.getUid();
                 firebaseAuth.signInWithEmailAndPassword(email.getText().toString(),
                         password.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>(){
 
@@ -135,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
 
         todaysbudget = findViewById(R.id.etTodayExpenditure);
         weeklycostcalculator = findViewById(R.id.btnWeeklyCosts);
-        setbudget = findViewById(R.id.btnSetBudget);
+        setbudget = findViewById(R.id.btnSetMyBudget);
         logout = findViewById(R.id.btnLogOut);
 
         weeklycostcalculator.setOnClickListener(new View.OnClickListener() {
@@ -163,7 +175,8 @@ public class MainActivity extends AppCompatActivity {
     }
     public void BudgetListen(){
         back1 = findViewById(R.id.btnBack);
-
+        savebudget = findViewById(R.id.btnSaveBudget);
+        mysetbudget = findViewById(R.id.etMySetBudget);
         back1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -171,10 +184,25 @@ public class MainActivity extends AppCompatActivity {
                     MenuListen();
                 }
         });
+        savebudget.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String myBudget = mysetbudget.getText().toString();
+                if(isNumeric(myBudget)){
+                    double doubleBudget = Double.valueOf(myBudget);
+                    userbudget.setSetBudget(doubleBudget);
+                    userbudget.setRemainingBudget(doubleBudget);
+                    dbref.child(userId).setValue(userbudget);
+                    Toast.makeText(MainActivity.this, "Your budget was successfully set to £" + emailAddress + ".", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
     }
     public void CostCalculatorListen(){
         back2 = findViewById(R.id.btnBack2);
+        calculatebtn = findViewById(R.id.btnCostSubmit);
+
 
         back2.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -183,7 +211,61 @@ public class MainActivity extends AppCompatActivity {
                 MenuListen();
             }
         });
+        calculatebtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rent = findViewById(R.id.etCost1);
+                food = findViewById(R.id.etCost2);
+                amenities = findViewById(R.id.etCost3);
+                disposable = findViewById(R.id.etCost4);
+                costvalue = findViewById(R.id.weeklycostlbl);
+
+                String[] etArray = new String[4];
+
+                etArray[0] = rent.getText().toString();
+                etArray[1] = food.getText().toString();
+                etArray[2] = amenities.getText().toString();
+                etArray[3] = disposable.getText().toString();
+//
+
+                if (isNumeric(etArray[0])&&isNumeric(etArray[1])&&isNumeric(etArray[2])&&isNumeric(etArray[3])) {
+                    for (int i = 0; i < 4; i++) {
+                        String temp = etArray[i];
+                         double convTemp = Double.valueOf(temp);
+                        totalweeklycost = totalweeklycost + convTemp;
+                    }
+                    costvalue.setText("£" + totalweeklycost);
+                    userbudget.setCalculatedCost(totalweeklycost);
+                    //save weekly cost code.
+                    totalweeklycost = 0.0;
+                }
+                else{
+                    Toast.makeText(MainActivity.this, "Error: Values are not numeric.", Toast.LENGTH_LONG).show();
+                }
+
+
+
+            }
+        });
+
     }
+    public static boolean isNumeric(final String str) {
+
+        if (str == null || str.length() == 0) {
+            return false;
+        }
+
+        try {
+
+            Double.parseDouble(str);
+            return true;
+
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
+    }
+
 }
 
 

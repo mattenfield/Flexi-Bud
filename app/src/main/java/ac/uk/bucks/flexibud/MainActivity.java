@@ -16,8 +16,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -45,6 +48,10 @@ public class MainActivity extends AppCompatActivity {
     UserBudget userbudget;
     Double totalweeklycost=0.0;
     String userId;
+    String budget;
+    String budgetremainder;
+    String calculatedcost;
+    String datebudget;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
                         progressBar.setVisibility(View.GONE);
                         FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
                         userId=user.getUid();
+                        retrieveData();
 
                         if(task.isSuccessful()){
                             setContentView(R.layout.main_menu);
@@ -269,6 +277,26 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
 
+    }
+    public void retrieveData(){
+        dbref = FirebaseDatabase.getInstance().getReference().child("UserBudget").child(userId);
+        dbref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    budget = dataSnapshot.child("setBudget").getValue().toString();
+                    budgetremainder = dataSnapshot.child("remainingBudget").getValue().toString();
+                    calculatedcost = dataSnapshot.child("calculatedCost").getValue().toString();
+                    datebudget = dataSnapshot.child("dateofBudgetSet").getValue().toString();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(MainActivity.this, "Error Receiving Data.", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
 }

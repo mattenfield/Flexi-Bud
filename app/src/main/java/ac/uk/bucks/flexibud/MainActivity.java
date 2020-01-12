@@ -22,36 +22,52 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 //view widgets
+
+
+    TextView costvalue;
+    EditText todaysbudget,rent,food,amenities,disposable,mysetbudget;
+    String emailAddress;
+    //======MAIN ACTIVITY ========//
     ProgressBar progressBar;
     EditText email;
     EditText password,confpassword;
     Button signin;
     Button signup;
-    FirebaseAuth firebaseAuth;
-    TextView costvalue;
-    TextView budgetvalue;
-    TextView overview;
-    EditText todaysbudget,rent,food,amenities,disposable,mysetbudget;
-    Button weeklycostcalculator;
-    Button setbudget,savebudget;
-    Button logout;
-    Button back1;
-    Button back2, calculatebtn;
+
     Button btnConfirm;
-    String emailAddress;
+    //======MAIN MENU ========//
+    TextView budgetvalue,budgetremaining, setbudcost;
+    Button weeklycostcalculator,setbudget,expsubmit;
+    TextView overview;
+    Button logout;
+    EditText ettodayexp;
+    //======COST CALCULATOR ========//
+    Button back2, calculatebtn,calc;
+    EditText costbudget;
+    //======SET BUDGET ========//
+    Button savebudget;
+    Button back1;
+    //======DB ========//
     DatabaseReference dbref;
+    FirebaseAuth firebaseAuth;
     UserBudget userbudget;
     Double totalweeklycost=0.0;
     String userId;
-    String budget;
-    String budgetremainder;
+    //======DATA RETRIEVAL ========//
     String calculatedcost;
     String datebudget;
+    String dateexp;
+    String budget;
+    String budgetremainder;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,12 +149,13 @@ public class MainActivity extends AppCompatActivity {
                         progressBar.setVisibility(View.GONE);
                         FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
                         userId=user.getUid();
-                        retrieveData();
+
 
                         if(task.isSuccessful()){
                             setContentView(R.layout.main_menu);
                             Toast.makeText(MainActivity.this, "Login Successful", Toast.LENGTH_LONG).show();
                             MenuListen();
+                            retrieveData();
 
                         }
                         else{
@@ -158,14 +175,47 @@ public class MainActivity extends AppCompatActivity {
 
         todaysbudget = findViewById(R.id.etTodayExpenditure);
         weeklycostcalculator = findViewById(R.id.btnWeeklyCosts);
+        expsubmit = findViewById(R.id.btnExpSubmit);
         setbudget = findViewById(R.id.btnSetMyBudget);
         logout = findViewById(R.id.btnLogOut);
+        ettodayexp = findViewById(R.id.etTodayExpenditure);
+        overview = findViewById(R.id.lbl_overview);
+
 
         weeklycostcalculator.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setContentView(R.layout.weekly_cost_calculator);
                 CostCalculatorListen();
+            }
+        });
+        expsubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Double dblRemaining = Double.valueOf(budgetremainder);
+                String todayexpstr = ettodayexp.getText().toString();
+                Double dbltodaysexp = Double.valueOf(todayexpstr);
+                Date todaysdate = Calendar.getInstance().getTime();
+
+                dblRemaining = dblRemaining - dbltodaysexp;
+
+
+                dbref.child("remainingBudget").setValue(dblRemaining);
+                dbref.child("dateofLastSubmission").setValue(todaysdate);
+
+
+                if(dblRemaining<0){
+                    Double overspend = dblRemaining*-1;
+                    overview.setText("You have overspent by £ "+ overspend);
+                }
+                else if(dblRemaining==0){
+                    overview.setText("You have spent your weekly budget.");
+                }
+                else if(dblRemaining>0){
+                    overview.setText("You have £" + dblRemaining + " remaining.");
+                }
+                retrieveData();
+
             }
         });
         setbudget.setOnClickListener(new View.OnClickListener() {
@@ -188,25 +238,41 @@ public class MainActivity extends AppCompatActivity {
         back1 = findViewById(R.id.btnBack);
         savebudget = findViewById(R.id.btnSaveBudget);
         mysetbudget = findViewById(R.id.etMySetBudget);
+        setbudcost = findViewById(R.id.setbudcost);
+        if(calculatedcost!=null){
+            setbudcost.setText("£"+calculatedcost);
+        }
+
         back1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     setContentView(R.layout.main_menu);
                     MenuListen();
+                    retrieveData();
                 }
         });
         savebudget.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String myBudget = mysetbudget.getText().toString();
+                Double dblBudget = Double.valueOf(myBudget);
+                Double calcTempCost = Double.valueOf(calculatedcost);
+                Date currentTime = Calendar.getInstance().getTime();
                 if(isNumeric(myBudget)){
-                    double doubleBudget = Double.valueOf(myBudget);
-                    userbudget.setSetBudget(doubleBudget);
-                    userbudget.setRemainingBudget(doubleBudget);
-                    Date currentTime = Calendar.getInstance().getTime();
-                    userbudget.setDateofBudgetSet(currentTime);
-                    dbref.child(userId).setValue(userbudget);
-                    Toast.makeText(MainActivity.this, "Your budget was successfully set to £" + userbudget + ".", Toast.LENGTH_LONG).show();
+                    if(dblBudget >=calcTempCost ){
+                        dbref.child("setBudget").setValue(dblBudget);
+                        dbref.child("remainingBudget").setValue(dblBudget);
+                        dbref.child("dateofBudgetSet").setValue(currentTime);
+
+                        Toast.makeText(MainActivity.this, "Your budget was successfully updated to £" + dblBudget + ".", Toast.LENGTH_LONG).show();
+                    }
+                    else{
+                        Toast.makeText(MainActivity.this, "Your budget must be higher or equal to your weekly costs.", Toast.LENGTH_LONG).show();
+                    }
+
+                }
+                else{
+                    Toast.makeText(MainActivity.this, "Data entered is not numeric.", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -215,16 +281,18 @@ public class MainActivity extends AppCompatActivity {
     public void CostCalculatorListen(){
         back2 = findViewById(R.id.btnBack2);
         calculatebtn = findViewById(R.id.btnCostSubmit);
-
+        costbudget = findViewById(R.id.etBudgetSet);
+        calc = findViewById(R.id.btnCalc);
 
         back2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setContentView(R.layout.main_menu);
                 MenuListen();
+                retrieveData();
             }
         });
-        calculatebtn.setOnClickListener(new View.OnClickListener() {
+        calc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 rent = findViewById(R.id.etCost1);
@@ -241,25 +309,48 @@ public class MainActivity extends AppCompatActivity {
                 etArray[3] = disposable.getText().toString();
 //
 
-                if (isNumeric(etArray[0])&&isNumeric(etArray[1])&&isNumeric(etArray[2])&&isNumeric(etArray[3])) {
+                if (isNumeric(etArray[0]) && isNumeric(etArray[1]) && isNumeric(etArray[2]) && isNumeric(etArray[3])) {
                     for (int i = 0; i < 4; i++) {
                         String temp = etArray[i];
-                         double convTemp = Double.valueOf(temp);
+                        double convTemp = Double.valueOf(temp);
                         totalweeklycost = totalweeklycost + convTemp;
                     }
                     costvalue.setText("£" + totalweeklycost);
-                    userbudget.setCalculatedCost(totalweeklycost);
-                    //save weekly cost code.
-                    totalweeklycost = 0.0;
                 }
                 else{
                     Toast.makeText(MainActivity.this, "Error: Values are not numeric.", Toast.LENGTH_LONG).show();
                 }
+            }});
+
+        calculatebtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                    Double calcBudget = null;
+                    String theBudget = costbudget.getText().toString();
+                    if(isNumeric(theBudget)) {
+                        calcBudget = Double.valueOf(theBudget);
+                    }
+                    else{
+                        Toast.makeText(MainActivity.this, "Your budget value is not numeric.", Toast.LENGTH_LONG).show();
+                    }
+
+                    if(calcBudget >= totalweeklycost){
+                        Date currentTime = Calendar.getInstance().getTime();
+                        userbudget.setDateofBudgetSet(currentTime);
+                        userbudget.setSetBudget(calcBudget);
+                        userbudget.setRemainingBudget(calcBudget);
+                        userbudget.setCalculatedCost(totalweeklycost);
+                        dbref.setValue(userbudget);
+                        Toast.makeText(MainActivity.this, "Your budget was successfully set to £" + calcBudget + ".", Toast.LENGTH_LONG).show();
+                    }
+                    else{
+                        Toast.makeText(MainActivity.this, "Your budget must be higher or equal to the weekly cost.", Toast.LENGTH_LONG).show();
+                    }
 
 
-
-            }
-        });
+                }
+            });
 
     }
     public static boolean isNumeric(final String str) {
@@ -280,6 +371,10 @@ public class MainActivity extends AppCompatActivity {
     }
     public void retrieveData(){
         dbref = FirebaseDatabase.getInstance().getReference().child("UserBudget").child(userId);
+        budgetvalue = findViewById(R.id.lbl_budget_val);
+        budgetremaining = findViewById(R.id.lbl_allowance_val);
+
+
         dbref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -288,6 +383,9 @@ public class MainActivity extends AppCompatActivity {
                     budgetremainder = dataSnapshot.child("remainingBudget").getValue().toString();
                     calculatedcost = dataSnapshot.child("calculatedCost").getValue().toString();
                     datebudget = dataSnapshot.child("dateofBudgetSet").getValue().toString();
+                    budgetvalue.setText("£"+budget);
+                    budgetremaining.setText("£"+budgetremainder);
+//
                 }
 
             }

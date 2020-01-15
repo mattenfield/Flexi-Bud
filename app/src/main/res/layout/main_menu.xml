@@ -22,6 +22,19 @@
         app:layout_constraintVertical_bias="0.137" />
 
     <TextView
+        android:id="@+id/main_subtitle_label8"
+        android:layout_width="275dp"
+        android:layout_height="50dp"
+        android:fontFamily="monospace"
+        android:text="If you haven't set a budget yet, use the Weekly Cost Calculator."
+        android:textColor="@color/fontColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.837" />
+
+    <TextView
         android:id="@+id/main_sub_heading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -164,6 +177,7 @@
         android:id="@+id/btnExpSubmit"
         android:layout_width="81dp"
         android:layout_height="42dp"
+        android:fontFamily="monospace"
         android:text="@string/btnsubmit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -176,6 +190,7 @@
         android:id="@+id/btnWeeklyCosts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="monospace"
         android:text="@string/weeklycostsbtnval"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -187,6 +202,7 @@
         android:id="@+id/btnSetMyBudget"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="monospace"
         android:text="Update Budget"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -199,7 +215,10 @@
         android:id="@+id/btnLogOut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark"
+        android:fontFamily="monospace"
         android:text="@string/logoutval"
+        android:textColor="@color/colorText"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"

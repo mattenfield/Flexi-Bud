@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     EditText password,confpassword;
     Button signin;
     Button signup;
+    Button cancel;
 
     Button btnConfirm;
     //======MAIN MENU ========//
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         signup = findViewById(R.id.btnSignUp);
         confpassword=findViewById(R.id.etConfPassword);
         btnConfirm=findViewById(R.id.btnConfirm);
+        cancel = findViewById(R.id.btnCancel);
         userbudget = new UserBudget();
         dbref = FirebaseDatabase.getInstance().getReference().child("UserBudget");
 
@@ -90,7 +92,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 confpassword.setVisibility(View.VISIBLE);
                 btnConfirm.setVisibility(View.VISIBLE);
-                signup.setVisibility(View.INVISIBLE);
+                signin.setVisibility(View.GONE);
+                signup.setVisibility(View.GONE);
+                cancel.setVisibility(View.VISIBLE);
 
             }
         });
@@ -114,8 +118,9 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(MainActivity.this, "Registered Successfully", Toast.LENGTH_LONG).show();
                                 password.setText("");
                                 confpassword.setText("");
-                                confpassword.setVisibility(View.INVISIBLE);
-                                btnConfirm.setVisibility(View.INVISIBLE);
+                                confpassword.setVisibility(View.GONE);
+                                btnConfirm.setVisibility(View.GONE);
+                                cancel.setVisibility(View.GONE);
                                 signin.setVisibility(View.VISIBLE);
                                 signup.setVisibility(View.VISIBLE);
                             }
@@ -133,6 +138,21 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                password.setText("");
+                confpassword.setText("");
+                confpassword.setVisibility(View.GONE);
+                btnConfirm.setVisibility(View.GONE);
+                cancel.setVisibility(View.GONE);
+                signin.setVisibility(View.VISIBLE);
+                signup.setVisibility(View.VISIBLE);
+
+            }
+
+
         });
 
         signin.setOnClickListener(new View.OnClickListener() {
@@ -316,6 +336,7 @@ public class MainActivity extends AppCompatActivity {
                         totalweeklycost = totalweeklycost + convTemp;
                     }
                     costvalue.setText("£" + totalweeklycost);
+
                 }
                 else{
                     Toast.makeText(MainActivity.this, "Error: Values are not numeric.", Toast.LENGTH_LONG).show();
@@ -342,6 +363,7 @@ public class MainActivity extends AppCompatActivity {
                         userbudget.setRemainingBudget(calcBudget);
                         userbudget.setCalculatedCost(totalweeklycost);
                         dbref.setValue(userbudget);
+                        totalweeklycost=0.0;
                         Toast.makeText(MainActivity.this, "Your budget was successfully set to £" + calcBudget + ".", Toast.LENGTH_LONG).show();
                     }
                     else{

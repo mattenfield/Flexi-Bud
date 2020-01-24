@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     TextView costvalue;
     EditText todaysbudget,rent,food,amenities,disposable,mysetbudget;
-    String emailAddress;
+    String emailaddress;
     //======MAIN ACTIVITY ========//
     ProgressBar progressBar;
     EditText email;
@@ -159,8 +159,8 @@ public class MainActivity extends AppCompatActivity {
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                emailAddress=email.getText().toString();
-                userbudget.setUserName(emailAddress);
+                emailaddress=email.getText().toString();
+                userbudget.setUserName(emailaddress);
                 if(email.getText().toString().equals("")||password.getText().toString().equals("")){
                     Toast.makeText(MainActivity.this, "Must not leave values blank.", Toast.LENGTH_LONG).show();
                 }

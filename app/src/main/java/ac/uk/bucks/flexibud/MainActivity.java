@@ -22,7 +22,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -49,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     TextView overview;
     Button logout;
     EditText ettodayexp;
+    String todaydate;
+    Date todaysdate;
     //======COST CALCULATOR ========//
     Button back2, calculatebtn,calc;
     EditText costbudget;
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                 String pword = password.getText().toString();
                 String cpword = confpassword.getText().toString();
 
-                if(pword.equals(cpword)){
+                if(pword.equals(cpword)&&!pword.equals("")&&!cpword.equals("")&&!email.equals("")){
                     progressBar.setVisibility(View.VISIBLE);
                     firebaseAuth.createUserWithEmailAndPassword(email.getText().toString(),
                             password.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -158,41 +159,43 @@ public class MainActivity extends AppCompatActivity {
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressBar.setVisibility(View.VISIBLE);
                 emailAddress=email.getText().toString();
                 userbudget.setUserName(emailAddress);
-                firebaseAuth.signInWithEmailAndPassword(email.getText().toString(),
-                        password.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>(){
+                if(email.getText().toString().equals("")||password.getText().toString().equals("")){
+                    Toast.makeText(MainActivity.this, "Must not leave values blank.", Toast.LENGTH_LONG).show();
+                }
+                else{
+                    progressBar.setVisibility(View.VISIBLE);
+                    firebaseAuth.signInWithEmailAndPassword(email.getText().toString(),
+                            password.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>(){
 
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        progressBar.setVisibility(View.GONE);
-                        FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
-                        userId=user.getUid();
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            progressBar.setVisibility(View.GONE);
+                            FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
+                            userId=user.getUid();
 
 
-                        if(task.isSuccessful()){
-                            setContentView(R.layout.main_menu);
-                            Toast.makeText(MainActivity.this, "Login Successful", Toast.LENGTH_LONG).show();
-                            MenuListen();
-                            retrieveData();
-
+                            if(task.isSuccessful()){
+                                setContentView(R.layout.main_menu);
+                                Toast.makeText(MainActivity.this, "Login Successful", Toast.LENGTH_LONG).show();
+                                MenuListen();
+                            }
+                            else{
+                                Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            }
                         }
-                        else{
-                            Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                        }
 
+                    });
+                }
 
-                    }
-
-                });
 
             }
         });
 
     }
     public void MenuListen(){
-
+        retrieveData();
         todaysbudget = findViewById(R.id.etTodayExpenditure);
         weeklycostcalculator = findViewById(R.id.btnWeeklyCosts);
         expsubmit = findViewById(R.id.btnExpSubmit);
@@ -200,7 +203,9 @@ public class MainActivity extends AppCompatActivity {
         logout = findViewById(R.id.btnLogOut);
         ettodayexp = findViewById(R.id.etTodayExpenditure);
         overview = findViewById(R.id.lbl_overview);
-
+        todaysdate = Calendar.getInstance().getTime();
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+        todaydate = sf.format(todaysdate);
 
         weeklycostcalculator.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -214,29 +219,42 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Double dblRemaining = Double.valueOf(budgetremainder);
                 String todayexpstr = ettodayexp.getText().toString();
+
+                if(!todayexpstr.equals(""))
+                {
                 Double dbltodaysexp = Double.valueOf(todayexpstr);
-                Date todaysdate = Calendar.getInstance().getTime();
+
 
                 dblRemaining = dblRemaining - dbltodaysexp;
 
+                if(!todaydate.equals(dateexp)){
 
-                dbref.child("remainingBudget").setValue(dblRemaining);
-                dbref.child("dateofLastSubmission").setValue(todaysdate);
+                    dbref.child("remainingBudget").setValue(dblRemaining);
+                    dbref.child("dateofLastSubmission").setValue(todaysdate);
 
+                    if(dblRemaining<0){
+                        Double overspend = dblRemaining*-1;
+                        overview.setText("You have overspent by £ "+ overspend);
+                    }
+                    else if(dblRemaining==0){
+                        overview.setText("You have spent your weekly budget.");
+                    }
+                    else if(dblRemaining>0){
+                        overview.setText("You have £" + dblRemaining + " remaining.");
+                    }
+                    retrieveData();
 
-                if(dblRemaining<0){
-                    Double overspend = dblRemaining*-1;
-                    overview.setText("You have overspent by £ "+ overspend);
                 }
-                else if(dblRemaining==0){
-                    overview.setText("You have spent your weekly budget.");
+                else{
+                    Toast.makeText(MainActivity.this, "You have already submitted your expenses today.", Toast.LENGTH_LONG).show();
                 }
-                else if(dblRemaining>0){
-                    overview.setText("You have £" + dblRemaining + " remaining.");
-                }
-                retrieveData();
 
+                }
+                else{
+                    Toast.makeText(MainActivity.this, "Cannot submit a blank value.", Toast.LENGTH_LONG).show();
+                }
             }
+
         });
         setbudget.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -275,26 +293,30 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String myBudget = mysetbudget.getText().toString();
-                Double dblBudget = Double.valueOf(myBudget);
-                Double calcTempCost = Double.valueOf(calculatedcost);
-                Date currentTime = Calendar.getInstance().getTime();
-                if(isNumeric(myBudget)){
-                    if(dblBudget >=calcTempCost ){
-                        dbref.child("setBudget").setValue(dblBudget);
-                        dbref.child("remainingBudget").setValue(dblBudget);
-                        dbref.child("dateofBudgetSet").setValue(currentTime);
+                if (!myBudget.equals("")) {
+                    Double dblBudget = Double.valueOf(myBudget);
+                    Double calcTempCost = Double.valueOf(calculatedcost);
+                    Date currentTime = Calendar.getInstance().getTime();
+                    if (isNumeric(myBudget)) {
+                        if (dblBudget >= calcTempCost) {
+                            dbref.child("setBudget").setValue(dblBudget);
+                            dbref.child("remainingBudget").setValue(dblBudget);
+                            dbref.child("dateofBudgetSet").setValue(currentTime);
 
-                        Toast.makeText(MainActivity.this, "Your budget was successfully updated to £" + dblBudget + ".", Toast.LENGTH_LONG).show();
-                    }
-                    else{
-                        Toast.makeText(MainActivity.this, "Your budget must be higher or equal to your weekly costs.", Toast.LENGTH_LONG).show();
-                    }
+                            Toast.makeText(MainActivity.this, "Your budget was successfully updated to £" + dblBudget + ".", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(MainActivity.this, "Your budget must be higher or equal to your weekly costs.", Toast.LENGTH_LONG).show();
+                        }
 
+                    } else {
+                        Toast.makeText(MainActivity.this, "Data entered is not numeric.", Toast.LENGTH_LONG).show();
+                    }
                 }
                 else{
-                    Toast.makeText(MainActivity.this, "Data entered is not numeric.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "Should not leave values blank.", Toast.LENGTH_LONG).show();
                 }
             }
+
         });
 
     }
@@ -347,29 +369,32 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                    Double calcBudget = null;
+                    Double calcBudget;
                     String theBudget = costbudget.getText().toString();
-                    if(isNumeric(theBudget)) {
+                    if(isNumeric(theBudget)&&!theBudget.equals("")) {
                         calcBudget = Double.valueOf(theBudget);
+
+                        if(calcBudget >= totalweeklycost){
+                            Calendar cal = Calendar.getInstance();
+                            Date currentTime = cal.getTime();
+                            cal.add(Calendar.DATE, -1);
+                            Date dateBefore1Day = cal.getTime();
+                            userbudget.setDateofBudgetSet(currentTime);
+                            userbudget.setDateofLastSubmission(dateBefore1Day);
+                            userbudget.setSetBudget(calcBudget);
+                            userbudget.setRemainingBudget(calcBudget);
+                            userbudget.setCalculatedCost(totalweeklycost);
+                            dbref.setValue(userbudget);
+                            totalweeklycost=0.0;
+                            Toast.makeText(MainActivity.this, "Your budget was successfully set to £" + calcBudget + ".", Toast.LENGTH_LONG).show();
+                        }
+                        else{
+                            Toast.makeText(MainActivity.this, "Your budget must be higher or equal to the weekly cost.", Toast.LENGTH_LONG).show();
+                        }
                     }
                     else{
                         Toast.makeText(MainActivity.this, "Your budget value is not numeric.", Toast.LENGTH_LONG).show();
                     }
-
-                    if(calcBudget >= totalweeklycost){
-                        Date currentTime = Calendar.getInstance().getTime();
-                        userbudget.setDateofBudgetSet(currentTime);
-                        userbudget.setSetBudget(calcBudget);
-                        userbudget.setRemainingBudget(calcBudget);
-                        userbudget.setCalculatedCost(totalweeklycost);
-                        dbref.setValue(userbudget);
-                        totalweeklycost=0.0;
-                        Toast.makeText(MainActivity.this, "Your budget was successfully set to £" + calcBudget + ".", Toast.LENGTH_LONG).show();
-                    }
-                    else{
-                        Toast.makeText(MainActivity.this, "Your budget must be higher or equal to the weekly cost.", Toast.LENGTH_LONG).show();
-                    }
-
 
                 }
             });
@@ -404,7 +429,11 @@ public class MainActivity extends AppCompatActivity {
                     budget = dataSnapshot.child("setBudget").getValue().toString();
                     budgetremainder = dataSnapshot.child("remainingBudget").getValue().toString();
                     calculatedcost = dataSnapshot.child("calculatedCost").getValue().toString();
-                    datebudget = dataSnapshot.child("dateofBudgetSet").getValue().toString();
+                    datebudget = dataSnapshot.child("dateofBudgetSet").child("time").getValue().toString();
+                    dateexp = dataSnapshot.child("dateofLastSubmission").child("time").getValue().toString();
+                    SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+                    Date datesub = new Date(Long.parseLong(dateexp));
+                    dateexp= sf.format(datesub);
                     budgetvalue.setText("£"+budget);
                     budgetremaining.setText("£"+budgetremainder);
 //

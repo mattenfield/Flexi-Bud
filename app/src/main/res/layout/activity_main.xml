@@ -54,8 +54,8 @@
 
     <TextView
         android:id="@+id/loginlbl"
-        android:layout_width="305dp"
-        android:layout_height="41dp"
+        android:layout_width="216dp"
+        android:layout_height="47dp"
         android:fontFamily="monospace"
         android:text="Please Log In or Register using your email and password."
         android:textColor="@color/fontColor"
@@ -65,7 +65,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.226" />
+        app:layout_constraintVertical_bias="0.261" />
 
     <EditText
         android:id="@+id/etEmail"

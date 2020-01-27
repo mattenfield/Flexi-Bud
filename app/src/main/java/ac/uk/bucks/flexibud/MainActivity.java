@@ -3,6 +3,7 @@ package ac.uk.bucks.flexibud;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -88,6 +89,14 @@ public class MainActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
+        if (firebaseAuth.getCurrentUser() != null){
+            setContentView(R.layout.main_menu);
+            Toast.makeText(MainActivity.this, "Login Successful", Toast.LENGTH_LONG).show();
+            FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
+            userId=user.getUid();
+            MenuListen();
+        }
+
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                     });
                 }
                 else {
-                    Toast.makeText(MainActivity.this, "Passwords do not match.", Toast.LENGTH_LONG).show();
+                    confpassword.setError("Unfortunately your passwords did not match.");
                 }
 
             }
@@ -195,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void MenuListen(){
-        retrieveData();
+
         todaysbudget = findViewById(R.id.etTodayExpenditure);
         weeklycostcalculator = findViewById(R.id.btnWeeklyCosts);
         expsubmit = findViewById(R.id.btnExpSubmit);
@@ -246,12 +255,12 @@ public class MainActivity extends AppCompatActivity {
 
                 }
                 else{
-                    Toast.makeText(MainActivity.this, "You have already submitted your expenses today.", Toast.LENGTH_LONG).show();
+                    ettodayexp.setError("You have already submitted your expenses today.");
                 }
 
                 }
                 else{
-                    Toast.makeText(MainActivity.this, "Cannot submit a blank value.", Toast.LENGTH_LONG).show();
+                    ettodayexp.setError("You cannot leave this value blank.");
                 }
             }
 
@@ -271,6 +280,7 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
+        retrieveData();
     }
     public void BudgetListen(){
         back1 = findViewById(R.id.btnBack);
@@ -305,15 +315,15 @@ public class MainActivity extends AppCompatActivity {
 
                             Toast.makeText(MainActivity.this, "Your budget was successfully updated to £" + dblBudget + ".", Toast.LENGTH_LONG).show();
                         } else {
-                            Toast.makeText(MainActivity.this, "Your budget must be higher or equal to your weekly costs.", Toast.LENGTH_LONG).show();
+                            mysetbudget.setError("Your budget must be higher than or equal to your weekly costs.");
                         }
 
                     } else {
-                        Toast.makeText(MainActivity.this, "Data entered is not numeric.", Toast.LENGTH_LONG).show();
+                        mysetbudget.setError("Data entered is not numeric.");
                     }
                 }
                 else{
-                    Toast.makeText(MainActivity.this, "Should not leave values blank.", Toast.LENGTH_LONG).show();
+                    mysetbudget.setError("You should not leave this value blank.");
                 }
             }
 
@@ -361,7 +371,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
                 else{
-                    Toast.makeText(MainActivity.this, "Error: Values are not numeric.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "Values are not numeric.", Toast.LENGTH_LONG).show();
                 }
             }});
 
@@ -389,11 +399,11 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "Your budget was successfully set to £" + calcBudget + ".", Toast.LENGTH_LONG).show();
                         }
                         else{
-                            Toast.makeText(MainActivity.this, "Your budget must be higher or equal to the weekly cost.", Toast.LENGTH_LONG).show();
+                            costbudget.setError("Your budget must be higher or equal to the weekly cost.");
                         }
                     }
                     else{
-                        Toast.makeText(MainActivity.this, "Your budget value is not numeric.", Toast.LENGTH_LONG).show();
+                        costbudget.setError("Your budget value is not numeric.");
                     }
 
                 }

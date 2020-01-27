@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void MenuListen(){
-
+        retrieveData();
         todaysbudget = findViewById(R.id.etTodayExpenditure);
         weeklycostcalculator = findViewById(R.id.btnWeeklyCosts);
         expsubmit = findViewById(R.id.btnExpSubmit);
@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
-        retrieveData();
+
     }
     public void BudgetListen(){
         back1 = findViewById(R.id.btnBack);

@@ -57,7 +57,7 @@
         android:layout_width="305dp"
         android:layout_height="41dp"
         android:fontFamily="monospace"
-        android:text="Please Log In or Register using your email and password. You will have to confirm your password if Registering."
+        android:text="Please Log In or Register using your email and password."
         android:textColor="@color/fontColor"
         android:textSize="12sp"
         android:textStyle="italic"

@@ -58,7 +58,7 @@
         android:fontFamily="monospace"
         android:text="Set my budget to: £"
         android:textColor="@color/fontColor"
-        android:textSize="18sp"
+        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.096"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -181,12 +181,10 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             progressBar.setVisibility(View.GONE);
-                            FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
-                            userId=user.getUid();
-
-
                             if(task.isSuccessful()){
                                 setContentView(R.layout.main_menu);
+                                FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
+                                userId=user.getUid();
                                 Toast.makeText(MainActivity.this, "Login Successful", Toast.LENGTH_LONG).show();
                                 MenuListen();
                             }
@@ -196,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                     });
+
                 }
 
 
@@ -226,42 +225,49 @@ public class MainActivity extends AppCompatActivity {
         expsubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Double dblRemaining = Double.valueOf(budgetremainder);
-                String todayexpstr = ettodayexp.getText().toString();
-
-                if(!todayexpstr.equals(""))
+                if(!budgetvalue.getText().toString().equals("NOT SET"))
                 {
-                Double dbltodaysexp = Double.valueOf(todayexpstr);
+                    Double dblRemaining = Double.valueOf(budgetremainder);
+                    String todayexpstr = ettodayexp.getText().toString();
+
+                    if(!todayexpstr.equals(""))
+                    {
+                        Double dbltodaysexp = Double.valueOf(todayexpstr);
 
 
-                dblRemaining = dblRemaining - dbltodaysexp;
+                        dblRemaining = dblRemaining - dbltodaysexp;
 
-                if(!todaydate.equals(dateexp)){
+                        if(!todaydate.equals(dateexp)){
 
-                    dbref.child("remainingBudget").setValue(dblRemaining);
-                    dbref.child("dateofLastSubmission").setValue(todaysdate);
+                            dbref.child("remainingBudget").setValue(dblRemaining);
+                            dbref.child("dateofLastSubmission").setValue(todaysdate);
 
-                    if(dblRemaining<0){
-                        Double overspend = dblRemaining*-1;
-                        overview.setText("You have overspent by £ "+ overspend);
+                            if(dblRemaining<0){
+                                Double overspend = dblRemaining*-1;
+                                overview.setText("You have overspent by £ "+ overspend);
+                            }
+                            else if(dblRemaining==0){
+                                overview.setText("You have spent your weekly budget.");
+                            }
+                            else if(dblRemaining>0){
+                                overview.setText("You have £" + dblRemaining + " remaining.");
+                            }
+                            retrieveData();
+
+                        }
+                        else{
+                            ettodayexp.setError("You have already submitted your expenses today.");
+                        }
+
                     }
-                    else if(dblRemaining==0){
-                        overview.setText("You have spent your weekly budget.");
+                    else{
+                        ettodayexp.setError("You cannot leave this value blank.");
                     }
-                    else if(dblRemaining>0){
-                        overview.setText("You have £" + dblRemaining + " remaining.");
-                    }
-                    retrieveData();
-
                 }
                 else{
-                    ettodayexp.setError("You have already submitted your expenses today.");
+                    ettodayexp.setError("You must set a budget first.");
                 }
 
-                }
-                else{
-                    ettodayexp.setError("You cannot leave this value blank.");
-                }
             }
 
         });
@@ -304,10 +310,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String myBudget = mysetbudget.getText().toString();
                 if (!myBudget.equals("")) {
-                    Double dblBudget = Double.valueOf(myBudget);
                     Double calcTempCost = Double.valueOf(calculatedcost);
                     Date currentTime = Calendar.getInstance().getTime();
                     if (isNumeric(myBudget)) {
+                        Double dblBudget = Double.valueOf(myBudget);
                         if (dblBudget >= calcTempCost) {
                             dbref.child("setBudget").setValue(dblBudget);
                             dbref.child("remainingBudget").setValue(dblBudget);
@@ -318,7 +324,7 @@ public class MainActivity extends AppCompatActivity {
                             mysetbudget.setError("Your budget must be higher than or equal to your weekly costs.");
                         }
 
-                    } else {
+                    } else if(!isNumeric(myBudget)) {
                         mysetbudget.setError("Data entered is not numeric.");
                     }
                 }
@@ -347,6 +353,7 @@ public class MainActivity extends AppCompatActivity {
         calc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                totalweeklycost=0.0;
                 rent = findViewById(R.id.etCost1);
                 food = findViewById(R.id.etCost2);
                 amenities = findViewById(R.id.etCost3);
